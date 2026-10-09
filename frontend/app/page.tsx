@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const metrics = [
   { label: 'Broker', value: 'Deriv' },
   { label: 'Account', value: 'Demo' },
@@ -24,7 +26,9 @@ export default function HomePage() {
         </div>
         <div className="hero-actions">
           <button className="primary-button">Open demo account</button>
-          <button className="secondary-button">Connect broker</button>
+          <Link href="/broker" className="secondary-button-link">
+            <button className="secondary-button" type="button">Connect broker</button>
+          </Link>
         </div>
       </section>
 
