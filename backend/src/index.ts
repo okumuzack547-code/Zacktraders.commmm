@@ -5,6 +5,7 @@ import helmet from 'helmet';
 
 import demoRouter from './routes/demo.js';
 import depositRouter from './routes/deposits.js';
+import derivRouter from './routes/deriv.js';
 import withdrawalRouter from './routes/withdrawals.js';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.get('/health', (_, res) => {
 app.use('/api/demo', demoRouter);
 app.use('/api/deposits', depositRouter);
 app.use('/api/withdrawals', withdrawalRouter);
+app.use('/api/deriv', derivRouter);
 
 app.listen(port, () => {
   console.log(`Tradescheme backend listening on http://localhost:${port}`);

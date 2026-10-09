@@ -12,7 +12,12 @@ router.get('/health', async (_req, res: Response) => {
     await derivAdapter.connect();
     return res.json({ ok: true, provider: 'deriv', status: 'connected' });
   } catch (error) {
-    return res.status(503).json({ ok: false, provider: 'deriv', status: 'disconnected', error: error instanceof Error ? error.message : 'connection failed' });
+    return res.status(503).json({
+      ok: false,
+      provider: 'deriv',
+      status: 'disconnected',
+      error: error instanceof Error ? error.message : 'connection failed'
+    });
   }
 });
 
