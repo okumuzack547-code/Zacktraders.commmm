@@ -1,4 +1,4 @@
-# Tradescheme.site
+# ZACKTRADER.COM
 
 Tradescheme is an options trading platform (vanilla options) scaffold for web + mobile with support for demo (paper) accounts and live trading integrations. This repository will contain the frontend (Next.js), backend (Node/NestJS or Express), Prisma schema for PostgreSQL, and CI/CD deployment configs.
 
