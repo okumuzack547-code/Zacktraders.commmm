@@ -25,7 +25,9 @@ export default function HomePage() {
           </p>
         </div>
         <div className="hero-actions">
-          <button className="primary-button">Open demo account</button>
+          <Link href="/trade" className="secondary-button-link">
+            <button className="primary-button" type="button">Trade</button>
+          </Link>
           <Link href="/broker" className="secondary-button-link">
             <button className="secondary-button" type="button">Connect broker</button>
           </Link>
