@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tradescheme-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tradescheme
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: tradescheme-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  backend:
+    build:
+      context: ./backend
+    container_name: tradescheme-backend
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tradescheme?schema=public
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: development
+    ports:
+      - '4000:4000'
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: tradescheme-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+
+volumes:
+  postgres_data:

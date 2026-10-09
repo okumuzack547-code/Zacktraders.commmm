@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPPORT
+}
+
+enum AccountStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum WalletType {
+  DEMO
+  LIVE
+  CASH
+}
+
+enum LedgerEntryType {
+  DEPOSIT
+  WITHDRAWAL
+  ORDER_FEE
+  TRADE_SETTLEMENT
+  ADJUSTMENT
+  BONUS
+}
+
+enum DepositStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+  FAILED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+  FAILED
+}
+
+enum OrderStatus {
+  QUEUED
+  PARTIAL
+  FILLED
+  CANCELLED
+  REJECTED
+}
+
+enum TradeSide {
+  BUY
+  SELL
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  name          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  role          UserRole      @default(USER)
+  status        AccountStatus @default(DRAFT)
+  kycVerifiedAt DateTime?
+
+  wallets      Wallet[]
+  deposits     Deposit[]
+  withdrawals  Withdrawal[]
+  orders       Order[]
+  tradeRecords Trade[]
+}
+
+model Wallet {
+  id          String     @id @default(cuid())
+  userId      String
+  type        WalletType @default(DEMO)
+  currency    String     @default("USD")
+  balance     Decimal    @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id])
+  ledgerItems Ledger[]
+
+  @@unique([userId, type, currency])
+}
+
+model Ledger {
+  id            String          @id @default(cuid())
+  walletId      String
+  type          LedgerEntryType
+  amount        Decimal
+  currency      String
+  referenceId   String?
+  description   String?
+  balanceAfter  Decimal
+  createdAt     DateTime        @default(now())
+
+  wallet        Wallet          @relation(fields: [walletId], references: [id])
+}
+
+model Deposit {
+  id          String        @id @default(cuid())
+  userId      String
+  walletId    String?
+  amount      Decimal
+  currency    String
+  status      DepositStatus @default(PENDING)
+  provider    String?
+  referenceId String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id])
+}
+
+model Withdrawal {
+  id          String          @id @default(cuid())
+  userId      String
+  walletId    String?
+  amount      Decimal
+  currency    String
+  status      WithdrawalStatus @default(PENDING)
+  provider    String?
+  referenceId String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user        User            @relation(fields: [userId], references: [id])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  symbol        String
+  side          TradeSide
+  quantity      Decimal
+  price         Decimal?
+  status        OrderStatus @default(QUEUED)
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user          User        @relation(fields: [userId], references: [id])
+  trades        Trade[]
+}
+
+model Trade {
+  id          String      @id @default(cuid())
+  orderId     String
+  userId      String
+  symbol      String
+  side        TradeSide
+  quantity    Decimal
+  price       Decimal
+  executedAt  DateTime    @default(now())
+
+  order       Order       @relation(fields: [orderId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+}
