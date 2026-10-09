@@ -45,6 +45,12 @@ button {
   background: rgba(16, 29, 49, 0.7);
 }
 
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .eyebrow {
   margin: 0 0 12px;
   color: var(--primary);
@@ -66,15 +72,25 @@ h1 {
   line-height: 1.7;
 }
 
-.primary-button {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+.primary-button,
+.secondary-button {
   border: none;
-  color: #04131d;
-  font-weight: 700;
   border-radius: 12px;
   padding: 14px 22px;
   cursor: pointer;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+  color: #04131d;
   box-shadow: 0 12px 24px rgba(34, 211, 238, 0.2);
+}
+
+.secondary-button {
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .stats-grid,
