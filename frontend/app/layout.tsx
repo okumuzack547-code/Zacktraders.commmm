@@ -3,7 +3,12 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Tradescheme',
-  description: 'Options trading platform scaffold'
+  description: 'Options trading platform scaffold',
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg'
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
