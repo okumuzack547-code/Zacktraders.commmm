@@ -3,6 +3,7 @@
   "builds": [
     { "src": "frontend/package.json", "use": "@vercel/next" }
   ],
+  "outputDirectory": ".next",
   "routes": [
     { "src": "/(.*)", "dest": "/frontend/$1" }
   ]
