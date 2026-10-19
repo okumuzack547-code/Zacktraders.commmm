@@ -1,0 +1,8 @@
+# Vercel ignore
+node_modules
+backend/
+.git
+.vscode
+.idea
+.DS_Store
+**/*.log

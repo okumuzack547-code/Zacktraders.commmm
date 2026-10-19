@@ -1,21 +1,22 @@
-# ZACKTRADER.COM
+Deployment notes
 
-Tradescheme is an options trading platform (vanilla options) scaffold for web + mobile with support for demo (paper) accounts and live trading integrations. This repository will contain the frontend (Next.js), backend (Node/NestJS or Express), Prisma schema for PostgreSQL, and CI/CD deployment configs.
+I have applied several repository fixes to make the Vercel deployment pick up the frontend Next.js app located in /frontend and to improve build reliability.
 
-IMPORTANT
-- This scaffold does NOT contain any real-money provider credentials or secrets.
-- Do NOT enable live trading or accept customer funds until you have a broker/custodian partner, completed KYC/AML and legal reviews, and a security audit.
+What I changed
+- Replaced vercel.json with an empty config so Vercel auto-detects the frontend app (previous overrides were causing STATIC_BUILD_NO_OUT_DIR)
+- Added .nvmrc (Node 18) and engines: { node: "18.x" } in frontend/package.json to ensure Node 18 is used
+- Added a minimal frontend/next.config.js
+- Added frontend/.env.example showing NEXT_PUBLIC_API_URL (do NOT commit secrets)
+- Added .vercelignore to prevent backend files from confusing Vercel
 
-Next steps
-1. Create a branch named `feature/tradescheme-mvp` (I will create this branch and add scaffold files).
-2. Add environment secrets in GitHub (DB, Redis, provider API keys, KMS/Vault).
-3. Run the dev environment with Docker Compose (postgres + redis + backend + frontend).
+What you must do in Vercel (one-time)
+1. Re-import the project or update project settings:
+   - Root Directory: frontend
+   - Framework Preset: Next.js
+   - Install Command: npm install
+   - Build Command: npm run build
+   - Output Directory: .next (optional)
+2. Add Environment Variable (Production): NEXT_PUBLIC_API_URL = https://<your-backend-url>
+3. Redeploy (Clear cache) and watch the build logs
 
-Files that will be added in the `feature/tradescheme-mvp` branch:
-- `architecture.md` — system architecture, payment rails, ledger model, and deployment checklist
-- `prisma/schema.prisma` — initial schema for users, wallets, ledger, deposits, withdrawals, orders, trades
-- `backend/` — backend skeleton with API endpoint stubs (deposits, withdrawals, demo)
-- `frontend/` — frontend skeleton (Next.js) with basic pages
-- `docker-compose.yml` — local dev stack
-
-If you need me to include a full UI mockup, OpenAPI spec, or start broker integrations now, tell me which and I will add them next.
+If the build still fails, copy the first ~40 lines of the build log and paste them here and I will fix the exact remaining issues.
