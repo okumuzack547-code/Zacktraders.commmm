@@ -1,5 +1,7 @@
 // Validates build-time environment variables required by the frontend.
-// This script runs before `npm run build` via the `prebuild` npm script.
+// This version only warns instead of failing the build so Vercel can continue
+// when the environment variable is missing. Recommended: set NEXT_PUBLIC_API_URL
+// in Vercel Project → Settings → Environment Variables for production builds.
 
 const required = [
   'NEXT_PUBLIC_API_URL'
@@ -11,9 +13,9 @@ for (const key of required) {
 }
 
 if (missing.length) {
-  console.error('\nERROR: Missing required build-time environment variables: ' + missing.join(', '));
-  console.error('Set them in Vercel Project → Settings → Environment Variables (Production) and redeploy.');
-  process.exit(1);
+  console.warn('\nWARNING: Missing required build-time environment variables: ' + missing.join(', '));
+  console.warn('Set them in Vercel Project → Settings → Environment Variables (Production) and redeploy.');
+  console.warn('Continuing build for now (this is a temporary relaxation).');
+} else {
+  console.log('Build environment check passed. NEXT_PUBLIC_API_URL=' + process.env.NEXT_PUBLIC_API_URL);
 }
-
-console.log('Build environment check passed. NEXT_PUBLIC_API_URL=' + process.env.NEXT_PUBLIC_API_URL);

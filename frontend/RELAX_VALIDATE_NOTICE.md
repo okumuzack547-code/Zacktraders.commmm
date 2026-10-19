@@ -1,0 +1,1 @@
+Relax prebuild validator to warn instead of fail so Vercel builds continue even when NEXT_PUBLIC_API_URL is missing. This is a temporary safety change — please set NEXT_PUBLIC_API_URL in Vercel for correct runtime behavior.
