@@ -1,6 +1,6 @@
-const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
-
 'use client';
+
+const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 import { FormEvent, useState } from 'react';
 
