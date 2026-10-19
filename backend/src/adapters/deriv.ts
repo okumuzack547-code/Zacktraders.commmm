@@ -103,16 +103,79 @@ export class DerivAdapter {
     });
   }
 
+  // Use an ephemeral websocket for authorize so the route works in serverless environments.
   async authorize(token: string): Promise<DerivAuthorizeResponse> {
-    const response = await this.send<{ authorize?: DerivAuthorizeResponse; error?: { message: string } }>({
-      authorize: token
+    const wsUrl = this.config.serverUrl ?? 'wss://ws.deriv.com/websockets/v3';
+    const reqId = this.nextRequestId++;
+
+    return new Promise<DerivAuthorizeResponse>((resolve, reject) => {
+      let settled = false;
+      const socket = new WebSocket(wsUrl);
+
+      const timeout = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          try {
+            socket.close();
+          } catch (e) {
+            /* ignore */
+          }
+          reject(new Error('Deriv authorize timed out'));
+        }
+      }, 15000);
+
+      socket.on('open', () => {
+        try {
+          const payload = { authorize: token, req_id: reqId, app_id: Number(this.config.appId || 1) };
+          socket.send(JSON.stringify(payload));
+        } catch (err) {
+          if (!settled) {
+            settled = true;
+            clearTimeout(timeout);
+            try { socket.close(); } catch {}
+            reject(err);
+          }
+        }
+      });
+
+      socket.on('message', (data) => {
+        if (settled) return;
+        try {
+          const payload = JSON.parse(data.toString());
+          if (payload.req_id === reqId) {
+            settled = true;
+            clearTimeout(timeout);
+            try { socket.close(); } catch {}
+
+            if (payload.error) {
+              reject(new Error(payload.error.message ?? 'Deriv authorize error'));
+              return;
+            }
+
+            resolve(payload.authorize ?? {});
+          }
+        } catch (err) {
+          // ignore parse errors for unrelated messages
+          // but do not let them crash the flow
+        }
+      });
+
+      socket.on('error', (err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        try { socket.close(); } catch {}
+        reject(err instanceof Error ? err : new Error(String(err)));
+      });
+
+      socket.on('close', () => {
+        if (settled) return;
+        // If socket closed before we settled, reject
+        settled = true;
+        clearTimeout(timeout);
+        reject(new Error('Deriv websocket closed before authorize response'));
+      });
     });
-
-    if (response.error) {
-      throw new Error(response.error.message);
-    }
-
-    return response.authorize ?? {};
   }
 
   async getBalance(loginId?: string): Promise<BalanceResponse[]> {
