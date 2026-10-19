@@ -1,4 +1,4 @@
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
 
 export interface DerivConfig {
   appId: string;
@@ -19,7 +19,7 @@ export interface BalanceResponse {
 }
 
 export class DerivAdapter {
-  private socket: WebSocket.WebSocket | null = null;
+  private socket: WebSocket | null = null;
   private config: DerivConfig;
   private nextRequestId = 1;
   private pending = new Map<number, { resolve: (value: any) => void; reject: (reason?: unknown) => void }>();
@@ -37,7 +37,7 @@ export class DerivAdapter {
 
     return new Promise((resolve, reject) => {
       try {
-        const socket = new WebSocket.WebSocket(wsUrl);
+        const socket = new WebSocket(wsUrl);
         this.socket = socket;
 
         socket.on('open', () => resolve());
